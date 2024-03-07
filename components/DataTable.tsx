@@ -11,89 +11,20 @@ const arr = [
   "Update/Delete",
 ];
 
-const bodyData = [
-  {
-    id: 1,
-    name: "John Doe",
-    phone: "08012345678",
-    email: "akt@123",
-    Hobbies: "Football",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    phone: "08012345679",
-    email: "jane@example.com",
-    Hobbies: "Reading",
-  },
-  {
-    id: 3,
-    name: "Alice Johnson",
-    phone: "08012345680",
-    email: "alice@example.com",
-    Hobbies: "Painting",
-  },
-  {
-    id: 4,
-    name: "Bob Williams",
-    phone: "08012345681",
-    email: "bob@example.com",
-    Hobbies: "Hiking",
-  },
-  {
-    id: 5,
-    name: "Charlie Brown",
-    phone: "08012345682",
-    email: "charlie@example.com",
-    Hobbies: "Gaming",
-  },
-  {
-    id: 6,
-    name: "Diana Prince",
-    phone: "08012345683",
-    email: "diana@example.com",
-    Hobbies: "Dancing",
-  },
-  {
-    id: 7,
-    name: "Eve Adams",
-    phone: "08012345684",
-    email: "eve@example.com",
-    Hobbies: "Cooking",
-  },
-  {
-    id: 8,
-    name: "Frank Miller",
-    phone: "08012345685",
-    email: "frank@example.com",
-    Hobbies: "Fishing",
-  },
-  {
-    id: 9,
-    name: "Grace Lee",
-    phone: "08012345686",
-    email: "grace@example.com",
-    Hobbies: "Gardening",
-  },
-  {
-    id: 10,
-    name: "Harry White",
-    phone: "08012345687",
-    email: "harry@example.com",
-    Hobbies: "Writing",
-  },
-];
-
 interface Props {
   clicked: boolean;
-  data: (e: number[]) => void;
+  data: (e: string[]) => void;
   btnStatus: (e: boolean) => void;
 }
 
 const DataTable = ({ clicked, data, btnStatus }: Props) => {
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const handleCheckboxChange = (id: number, checked: boolean) => {
+  const [tableData, setTableData] = useState([]);
+
+  // console.log(tableData);
+
+  const handleCheckboxChange = (id: string, checked: boolean) => {
     if (checked) {
       setSelectedIds([...selectedIds, id]);
       btnStatus(true);
@@ -111,11 +42,40 @@ const DataTable = ({ clicked, data, btnStatus }: Props) => {
     }
   }, [clicked, selectedIds, data]);
 
+  useEffect(() => {
+    const fecthData = async () => {
+      try {
+        const usersData = await fetch("http://localhost:3001/getusers", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await usersData.json();
+        const newData = data.map((item: any) => {
+          return {
+            id: item._id,
+            name: item.name,
+            phone: item.phone,
+            email: item.email,
+            hobbies: item.hobbies,
+          };
+        });
+        console.log(newData);
+        setTableData(newData);
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    };
+    fecthData();
+  }, []);
+
   return (
     <div className=" w-full max-sm:hidden">
       <table className="w-full caption-bottom text-sm">
         <thead>
-          <tr className="border-b transition-colors hover:bg-gray-100 ">
+          <tr className="border-b transition-colors hover:bg-gray-100  ">
             {arr.map((item) => {
               return (
                 <th
@@ -128,8 +88,15 @@ const DataTable = ({ clicked, data, btnStatus }: Props) => {
             })}
           </tr>
         </thead>
-        {bodyData.length > 0 ? (
-          bodyData.map((item) => {
+
+        {tableData.map(
+          (item: {
+            id: string;
+            name: string;
+            phone: string;
+            email: string;
+            hobbies: string;
+          }) => {
             return (
               <TableBody
                 key={item.id}
@@ -137,9 +104,7 @@ const DataTable = ({ clicked, data, btnStatus }: Props) => {
                 onCheckboxChange={handleCheckboxChange}
               />
             );
-          })
-        ) : (
-          <span className="text-black text-xl mx-auto ">No data available</span>
+          }
         )}
       </table>
     </div>
