@@ -6,12 +6,12 @@ import NavBar from "@/components/NavBar";
 import { useState } from "react";
 
 const Home = () => {
-  const [data, setData] = useState<number[]>([]);
+  const [data, setData] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [status, setStatus] = useState(false);
 
-  const handleAdd = (e: number[]) => {
+  const handleAdd = (e: string[]) => {
     setData(e);
   };
 
@@ -22,7 +22,7 @@ const Home = () => {
     }
   };
 
-  const selectedData = (e: number[]) => {
+  const selectedData = (e: string[]) => {
     console.log("Home", e);
     handleAdd(e);
   };
@@ -32,7 +32,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen relative">
-      {showForm && <AddForm showForm={showForm}/>}
+      {showForm && <AddForm />}
       <NavBar
         handleSelectedData={handleSelectedIds}
         selectedData={data}
